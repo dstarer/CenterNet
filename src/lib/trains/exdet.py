@@ -7,11 +7,11 @@ import numpy as np
 import cv2
 import sys
 import time
-from utils.debugger import Debugger
-from models.data_parallel import DataParallel
-from models.losses import FocalLoss, RegL1Loss
-from models.decode import agnex_ct_decode, exct_decode
-from models.utils import _sigmoid
+from lib.utils.debugger import Debugger
+from lib.models.data_parallel import DataParallel
+from lib.models.losses import FocalLoss, RegL1Loss
+from lib.models.decode import agnex_ct_decode, exct_decode
+from lib.models.utils import _sigmoid
 from .base_trainer import BaseTrainer
 
 class ExdetLoss(torch.nn.Module):

@@ -3,7 +3,9 @@ from __future__ import division
 from __future__ import print_function
 
 import _init_paths
+import sys
 
+sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
 import os
 import json
 import cv2
@@ -46,8 +48,9 @@ class PrefetchDataset(torch.utils.data.Dataset):
 
 def prefetch_test(opt):
   os.environ['CUDA_VISIBLE_DEVICES'] = opt.gpus_str
-
+  print("dataset --- ", opt.dataset)
   Dataset = dataset_factory[opt.dataset]
+
   opt = opts().update_dataset_info_and_set_heads(opt, Dataset)
   print(opt)
   Logger(opt)
@@ -81,7 +84,7 @@ def prefetch_test(opt):
 
 def test(opt):
   os.environ['CUDA_VISIBLE_DEVICES'] = opt.gpus_str
-
+  print ("opt.dataset ", opt.dataset)
   Dataset = dataset_factory[opt.dataset]
   opt = opts().update_dataset_info_and_set_heads(opt, Dataset)
   print(opt)

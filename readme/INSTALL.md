@@ -6,33 +6,37 @@ After install Anaconda:
 
 0. [Optional but recommended] create a new conda environment. 
 
-    ~~~
-    conda create --name CenterNet python=3.6
-    ~~~
-    And activate the environment.
-    
-    ~~~
-    conda activate CenterNet
-    ~~~
+     ~~~
+     conda create --name CenterNet python=3.6
+     ~~~
+     And activate the environment.
+
+     ~~~
+     conda activate CenterNet
+     ~~~
 
 1. Install pytorch0.4.1:
 
     ~~~
     conda install pytorch=0.4.1 torchvision -c pytorch
     ~~~
-    
+
     And disable cudnn batch normalization(Due to [this issue](https://github.com/xingyizhou/pytorch-pose-hg-3d/issues/16)).
-    
+
+    Cuda 10 with pytorch 1.0:
+
+    ​	conda install pytorch=1.0.1 torchvision -c pytorch
+
      ~~~
     # PYTORCH=/path/to/pytorch # usually ~/anaconda3/envs/CenterNet/lib/python3.6/site-packages/
     # for pytorch v0.4.0
     sed -i "1194s/torch\.backends\.cudnn\.enabled/False/g" ${PYTORCH}/torch/nn/functional.py
-    # for pytorch v0.4.1
+    # for pytorch v0.4.1 / 1.0.1
     sed -i "1254s/torch\.backends\.cudnn\.enabled/False/g" ${PYTORCH}/torch/nn/functional.py
      ~~~
-     
+
      For other pytorch version, you can manually open `torch/nn/functional.py` and find the line with `torch.batch_norm` and replace the `torch.backends.cudnn.enabled` with `False`. We observed slight worse training results without doing so. 
-     
+
 2. Install [COCOAPI](https://github.com/cocodataset/cocoapi):
 
     ~~~
@@ -56,14 +60,34 @@ After install Anaconda:
     ~~~
     pip install -r requirements.txt
     ~~~
-    
-    
+
 5. Compile deformable convolutional (from [DCNv2](https://github.com/CharlesShang/DCNv2/tree/pytorch_0.4)).
 
     ~~~
     cd $CenterNet_ROOT/src/lib/models/networks/DCNv2
     ./make.sh
     ~~~
+
+    If you use Cuda 10 try to 
+
+    ```
+    1. git clone git@github.com:CharlesShang/DCNv2.git
+    2. before execute make./sh, check pytorch version. 
+    Probably not 1.0, serveral things need to check ~/.local/lib/python3.6/site_packages/torch
+    python -c "import sys; print(sys.path)" check the system path.
+    3. do ./make.sh
+    ```
+
+    related issues.
+
+     torch's version. 
+
+    https://github.com/CharlesShang/DCNv2/issues/19
+
+    cuda's version
+
+    https://github.com/xingyizhou/CenterNet/issues/67
+
 6. [Optional, only required if you are using extremenet or multi-scale testing] Compile NMS if your want to use multi-scale testing or test ExtremeNet.
 
     ~~~

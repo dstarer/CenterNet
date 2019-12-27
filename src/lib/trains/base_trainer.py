@@ -5,8 +5,8 @@ from __future__ import print_function
 import time
 import torch
 from progress.bar import Bar
-from models.data_parallel import DataParallel
-from utils.utils import AverageMeter
+from lib.models.data_parallel import DataParallel
+from lib.utils.utils import AverageMeter
 
 
 class ModelWithLoss(torch.nn.Module):
@@ -117,3 +117,4 @@ class BaseTrainer(object):
 
   def train(self, epoch, data_loader):
     return self.run_epoch('train', epoch, data_loader)
+
