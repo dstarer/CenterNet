@@ -34,6 +34,8 @@ class opts(object):
                                       'Reloaded the optimizer parameter and '
                                       'set load_model to model_last.pth '
                                       'in the exp dir if load_model is empty.')
+        self.parser.add_argument('--benchmark', default='', help='path to benchmark.json')
+        self.parser.add_argument('--output', default='', help='path to save detection result')
 
         # system
         self.parser.add_argument('--gpus', default='0',

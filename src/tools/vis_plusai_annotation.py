@@ -1,19 +1,36 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-
 import sys
-# sys.path.remove("/opt/ros/kinetic/lib/python2.7/dist-packages")
 
+sys.path.remove("/opt/ros/kinetic/lib/python2.7/dist-packages")
+
+import pickle
+import json
+import numpy as np
+# import cv2
 import torch.utils.data as data
+import os
 import pycocotools.coco as coco
 from pycocotools.cocoeval import COCOeval
-import numpy as np
-import torch
-import json
-import cv2
-import os
-import math
+from PIL import Image, ImageDraw
+from lib.opts import opts
+import matplotlib.pyplot as plt
+
+DATA_PATH = '/media/andy/andy-2TB/2d_labeling/2d_detection_data/'
+DEBUG = False
+
+
+def load_json_data(fpath):
+    with open(fpath, "r") as f:
+        json_data = json.load(f)
+    return json_data
+
+
+def dump_json(json_data, fpath):
+    with open(fpath, "w") as f:
+        json.dump(json_data, f)
+
 
 cats = ['__background__', 'car', 'bus', 'truck', 'moto', 'pedestrian', 'bike', 'traffic_cone', 'barricade', 'other']
 
@@ -68,6 +85,30 @@ class PlusAI(data.Dataset):
     def __len__(self):
         return self.num_samples
 
+    def _coco_box_to_bbox(self, box):
+        bbox = np.array([box[0], box[1], box[0] + box[2], box[1] + box[3]],
+                        dtype=np.float32)
+        return bbox
+
+    def __getitem__(self, index):
+        img_id = self.images[index]
+        file_name = self.coco.loadImgs(ids=[img_id])[0]['file_name']
+        img_path = os.path.join(self.img_dir, file_name)
+        ann_ids = self.coco.getAnnIds(imgIds=[img_id])
+        anns = self.coco.loadAnns(ids=ann_ids)
+        num_objs = min(len(anns), self.max_objs)
+
+        img = Image.open(img_path)
+        img_draw = ImageDraw.Draw(img)
+
+        for k in range(num_objs):
+            ann = anns[k]
+            box = self._coco_box_to_bbox(ann['bbox'])
+            cls_id = int(self.cat_ids[ann['category_id']])
+            img_draw.rectangle(box, outline=self.voc_color[cls_id])
+
+        return img
+
     def _to_float(self, x):
         return float("{:.2f}".format(x))
 
@@ -105,3 +146,20 @@ class PlusAI(data.Dataset):
         coco_eval.accumulate()
         coco_eval.summarize()
 
+
+def main(opt):
+    plt.figure("Image")
+    opt.data_dir = '/media/andy/andy-2TB/2d_labeling/2d_detection_data'
+    dataset = PlusAI(opt, 'train')
+    print("total number of images: ", len(dataset))
+    for ind in range(len(dataset)):
+        img = dataset[ind]
+        plt.imshow(img)
+        plt.axis('on')
+        plt.title('image')
+        plt.show()
+
+
+if __name__ == '__main__':
+    opt = opts().parse()
+    main(opt)

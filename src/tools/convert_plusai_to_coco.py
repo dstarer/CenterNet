@@ -16,7 +16,7 @@ DEBUG = False
 
 '''
 # Values Name Description
-1 type  'Car', 'Bus', 'Truck', 'Pedestrian', 'Bicycle', 'Traffic Cone', 'Traffic Barrier', '' 
+1 type  'Car', 'Bus', 'Truck', 'Pedestrian', 'Bicycle', 'Traffic Cone', 'barricade', 'moto', 'other' 
 
 '''
 
@@ -62,8 +62,8 @@ for i, cat in enumerate(cats):
 
 ret = {"images": [], "annotations": [], "categories": cat_info}
 
-# labeling_path = DATA_PATH + "train/train.json"
-labeling_path = DATA_PATH + "test/test.json"
+labeling_path = DATA_PATH + "train/train.json"
+# labeling_path = DATA_PATH + "test/test.json"
 json_data = load_json_data(labeling_path)
 
 image_to_id = {}
@@ -73,7 +73,7 @@ for item in json_data:
     img_abs_path = DATA_PATH + "images/" + item['file']
     try:
         image = cv2.imread(img_abs_path)
-        image_width, image_height, _ = image.shape
+        image_height, image_width, _ = image.shape
     except Exception as e:
         print(e)
         print("skip image, path ", img_abs_path)
@@ -115,6 +115,6 @@ for item in json_data:
 print("# images: ", len(ret['images']))
 print("# annotations: ", len(ret['annotations']))
 
-out_path = "{}/annotations/plusai_{}.json".format(DATA_PATH, "val")
+out_path = "{}/annotations/plusai_{}.json".format(DATA_PATH, "train")
 dump_json(ret, out_path)
 
