@@ -100,6 +100,16 @@ class CTDetDataset(data.Dataset):
             ann = anns[k]
             bbox = self._coco_box_to_bbox(ann['bbox'])
             cls_id = int(self.cat_ids[ann['category_id']])
+            weight_factor = 1.0
+            if 'occluded' in ann:
+                occluded = ann['weight_factor']
+                if occluded == 0:
+                    weight_factor = 1.0
+                elif occluded == 1:
+                    weight_factor = 0.95
+                elif occluded == 2:
+                    weight_factor = 0.85
+
             if flipped:
                 bbox[[0, 2]] = width - bbox[[2, 0]] - 1
             bbox[:2] = affine_transform(bbox[:2], trans_output)
@@ -114,7 +124,7 @@ class CTDetDataset(data.Dataset):
                 ct = np.array(
                     [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2], dtype=np.float32)
                 ct_int = ct.astype(np.int32)
-                draw_gaussian(hm[cls_id], ct_int, radius)
+                draw_gaussian(hm[cls_id], ct_int, radius, weight_factor)
                 wh[k] = 1. * w, 1. * h
                 ind[k] = ct_int[1] * output_w + ct_int[0]
                 reg[k] = ct - ct_int

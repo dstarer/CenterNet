@@ -123,9 +123,9 @@ def gaussian2D(shape, sigma=1):
     h[h < np.finfo(h.dtype).eps * h.max()] = 0
     return h
 
-def draw_umich_gaussian(heatmap, center, radius, k=1):
+def draw_umich_gaussian(heatmap, center, radius, k=1, weight_factor=1.0):
   diameter = 2 * radius + 1
-  gaussian = gaussian2D((diameter, diameter), sigma=diameter / 6)
+  gaussian = gaussian2D((diameter, diameter), sigma=diameter / 6) * weight_factor
   
   x, y = int(center[0]), int(center[1])
 
@@ -172,7 +172,7 @@ def draw_dense_reg(regmap, heatmap, center, value, radius, is_offset=False):
   return regmap
 
 
-def draw_msra_gaussian(heatmap, center, sigma):
+def draw_msra_gaussian(heatmap, center, sigma, weight_factor=1.0):
   tmp_size = sigma * 3
   mu_x = int(center[0] + 0.5)
   mu_y = int(center[1] + 0.5)
@@ -185,7 +185,7 @@ def draw_msra_gaussian(heatmap, center, sigma):
   x = np.arange(0, size, 1, np.float32)
   y = x[:, np.newaxis]
   x0 = y0 = size // 2
-  g = np.exp(- ((x - x0) ** 2 + (y - y0) ** 2) / (2 * sigma ** 2))
+  g = np.exp(- ((x - x0) ** 2 + (y - y0) ** 2) / (2 * sigma ** 2)) * weight_factor
   g_x = max(0, -ul[0]), min(br[0], h) - ul[0]
   g_y = max(0, -ul[1]), min(br[1], w) - ul[1]
   img_x = max(0, ul[0]), min(br[0], h)
